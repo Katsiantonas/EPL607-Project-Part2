@@ -62,15 +62,14 @@ def edge_function(vertex1: Point, vertex2: Point, point: Point):
     return (p.x - v1.x) * (v2.y - v1.y) - (p.y - v1.y) * (v2.x - v1.x)
 
 
-def get_barycentric_weights(shape: Shape, point: Point):
-    w0 = edge_function(shape.points[1], shape.points[2], point)
-    w1 = edge_function(shape.points[2], shape.points[0], point)
-    w2 = edge_function(shape.points[0], shape.points[1], point)
-
-    return w0, w1, w2
-
-
 def get_inverse_depth(shape, w0, w1, w2):
+    area = edge_function(*shape.points)
+
+    # Normalized Barycentric Weights
+    w0 /= area
+    w1 /= area
+    w2 /= area
+
     z0, z1, z2 = shape.points[0].z, shape.points[1].z, shape.points[2].z
 
     return w0 * z0 + w1 * z1 + w2 * z2
@@ -82,18 +81,17 @@ def rasterize_shape(shape, image, z_buffer):
     min_y = min([point.y for point in shape.points])
     max_y = max([point.y for point in shape.points])
 
-    area = edge_function(*shape.points)
-
     for y in range(min_y, max_y):
         for x in range(min_x, max_x):
             point = Point(x=x, y=y, z=0)
 
-            w0, w1, w2 = get_barycentric_weights(shape, point)
+            w0 = edge_function(shape.points[1], shape.points[2], point)
+            w1 = edge_function(shape.points[2], shape.points[0], point)
+            w2 = edge_function(shape.points[0], shape.points[1], point)
 
             if w0 >= 0 and w1 >= 0 and w2 >= 0:
-                w0 /= area
-                w1 /= area
-                w2 /= area
+
+                # Normalized Barycentric Weights
 
                 point.z = get_inverse_depth(shape, w0, w1, w2)
 
@@ -114,7 +112,7 @@ def render(shapes: list[Shape]):
         rasterize_shape(screen_shape, image, z_buffer)
 
     image.show()
-    image.save("rasterized_shapes.png")
+    image.save("image.png")
 
 
 render([
