@@ -109,10 +109,7 @@ def render(shapes: list[Shape]):
 
     for shape in shapes:
         projected_shape = project_shape(shape)
-        print('projected', [vars(point) for point in projected_shape.points])
-
         screen_shape = viewport_transform_shape(projected_shape)
-        print('screen coords', [vars(point) for point in screen_shape.points])
 
         rasterize_shape(screen_shape, image, z_buffer)
 
