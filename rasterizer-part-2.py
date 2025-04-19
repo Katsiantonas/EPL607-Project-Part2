@@ -90,9 +90,6 @@ def rasterize_shape(shape, image, z_buffer):
             w2 = edge_function(shape.points[0], shape.points[1], point)
 
             if w0 >= 0 and w1 >= 0 and w2 >= 0:
-
-                # Normalized Barycentric Weights
-
                 point.z = get_inverse_depth(shape, w0, w1, w2)
 
                 if point.z > z_buffer[y][x]:
